@@ -1,0 +1,15 @@
+# Pastas de compilação (Arquivos pesados que o VS gera sozinho)
+[Bb]in/
+[Oo]bj/
+
+# Arquivos de configuração pessoal e cache
+.vs/
+*.user
+*.suo
+
+# Banco de dados local (para não subir o arquivo físico do DB)
+*.mdf
+*.ldf
+
+# Segredos e configurações de desenvolvimento
+appsettings.Development.json
