@@ -1,15 +1,37 @@
-# Pastas de compilação (Arquivos pesados que o VS gera sozinho)
+## --- BUILD ---
 [Bb]in/
 [Oo]bj/
+out/
+publish/
 
-# Arquivos de configuração pessoal e cache
+## --- VISUAL STUDIO ---
 .vs/
+.vscode/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
 
-# Banco de dados local (para não subir o arquivo físico do DB)
+## --- BANCO LOCAL ---
 *.mdf
 *.ldf
+*.db
+*.sqlite
 
-# Segredos e configurações de desenvolvimento
-appsettings.Development.json
+## --- SEGREDOS ---
+**/secrets.json
+appsettings.Local.json
+
+## --- LOGS ---
+*.log
+
+## --- SISTEMA ---
+.DS_Store
+Thumbs.db
+
+## --- TESTES ---
+TestResults/
+coverage/
+
+## --- PACOTES ---
+*.nupkg

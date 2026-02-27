@@ -1,24 +1,35 @@
-using Person.Data;
-using Person.Routes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Swagger/ OpenAPI
-builder.Services.AddEndpointsApiExplorer(); // Explora endpoints da minimal API
-builder.Services.AddSwaggerGen();           // Gera documentação Swagger
-builder.Services.AddScoped<PersonContext>(); // Registra o contexto do Entity Framework para injeção de dependência
+builder.Services.AddControllers();
+
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new Exception("JWT Key não configurada.");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey)
+            ),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();      // Gera o JSON do Swagger
-    app.UseSwaggerUI();    // Exibe interface web do Swagger
-}
+app.UseAuthentication(); // Primeiro autentica
+app.UseAuthorization();  // Depois autoriza
 
-app.PersonRoutes(); // Configura as rotas para "Person"
-
-
-app.UseHttpsRedirection();
+app.MapControllers();
 
 app.Run();
