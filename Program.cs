@@ -1,35 +1,28 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Person.Extensions;
+using Person.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-
-var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new Exception("JWT Key não configurada.");
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey)
-            ),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
-
-builder.Services.AddAuthorization();
+// --- 1. CONFIGURAÇÃO DE SERVIÇOS (DI) ---
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerSecurity();       // Configuração do Swagger com Cadeado
+builder.Services.AddJwtSecurity(builder.Configuration); // Configuração de Auth
+builder.Services.AddDatabase();              // Injeção do PersonContext (Scoped)
 
 var app = builder.Build();
 
-app.UseAuthentication(); // Primeiro autentica
-app.UseAuthorization();  // Depois autoriza
+// --- 2. PIPELINE DE REQUISIÇÃO (MIDDLEWARES) ---
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
+
+// --- 3. MAPEAMENTO DE ROTAS ---
+app.AuthRoutes();   // Rota de Login (/login)
+app.PersonRoutes(); // Rotas de CRUD (/person)
 
 app.Run();

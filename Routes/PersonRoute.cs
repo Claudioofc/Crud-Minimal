@@ -18,8 +18,10 @@ namespace Person.Routes
                     return Results.BadRequest("O nome é obrigatório.");
 
                 var person = new PersonModel(req.Name);
+
                 await context.AddAsync(person);
                 await context.SaveChangesAsync();
+                // Após o SaveChanges, o EF preenche o 'person.Id' com o valor do banco.
 
                 var response = new PersonResponse(person.Id, person.Name);
                 return Results.Created($"/person/{person.Id}", response);
@@ -36,8 +38,8 @@ namespace Person.Routes
                 return Results.Ok(people);
             }).RequireAuthorization();
 
-            // PUT: Atualizar
-            route.MapPut("{id:guid}", async (Guid id, PersonRequest req, PersonContext context) =>
+            // PUT: Atualizar 
+            route.MapPut("{id:int}", async (int id, PersonRequest req, PersonContext context) =>
             {
                 var person = await context.People.FindAsync(id);
 
@@ -51,17 +53,15 @@ namespace Person.Routes
             }).RequireAuthorization();
 
             // DELETE: Soft Delete
-            route.MapDelete("{id:guid}", async (Guid id, PersonContext context) =>
+            route.MapDelete("{id:int}", async (int id, PersonContext context) =>
             {
                 var person = await context.People.FindAsync(id);
-
-                if (person is null || person.IsDeleted)
-                    return Results.NotFound();
+                if (person is null || person.IsDeleted) return Results.NotFound();
 
                 person.SetDeleted(true);
                 await context.SaveChangesAsync();
 
-                return Results.NoContent();
+                return Results.Ok(new { Mensagem = "Deletado com sucesso!", Id = id });
             }).RequireAuthorization();
         }
     }

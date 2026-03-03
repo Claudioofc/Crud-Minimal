@@ -1,21 +1,18 @@
-﻿namespace Person.Routes.Models
+﻿namespace Person.Routes.Models;
+
+public class PersonModel
 {
-    public class PersonModel
+    public PersonModel(string name)
     {
-        public PersonModel(string name)
-        {
-            Id = Guid.NewGuid();
-            Name = name;
-            IsDeleted = false;
-        }
-
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public bool IsDeleted { get; set; } // Flag do Soft Delete
-
-        public void ChangeName(string name) => Name = name;
-
-        // Método para facilitar a ativação/desativação
-        public void SetDeleted(bool status) => IsDeleted = status;
+        
+        Name = name;
+        IsDeleted = false;
     }
+
+    public int Id { get; private set; } 
+    public string Name { get; private set; }
+    public bool IsDeleted { get; private set; }
+
+    public void ChangeName(string name) => Name = name;
+    public void SetDeleted(bool status) => IsDeleted = status;
 }
